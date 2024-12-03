@@ -1,0 +1,44 @@
+package main
+
+import (
+	"fmt"
+	"os"
+	"regexp"
+	"strconv"
+	"strings"
+	"time"
+)
+
+
+func main() {
+	start := time.Now()
+    dat, _ := os.ReadFile("./input/input")
+
+
+	data := string(dat)
+	lines := strings.Split(data, "\n")
+	// lines := []string{"63 65 64"}
+	re := regexp.MustCompile(`mul\(\d*,\d*\)`)	
+	multiplications := make([]string, 0)
+	for _, line := range lines {
+		matches := re.FindAll([]byte(line), -1)
+		for _, match  := range matches {
+			multiplications = append(multiplications, string(match))
+		}
+	}
+	numbers := regexp.MustCompile(`\d{1,}`)
+	var sum int64
+	sum = 0
+	for _, multiplication := range multiplications {
+		matches := numbers.FindAll([]byte(multiplication), -1) 
+		// fmt.Print(matches)
+		first, _ := strconv.ParseInt(string(matches[0]), 10, 0)
+		second, _ := strconv.ParseInt(string(matches[1]), 10, 0)
+		sum = sum + (first * second)
+	}
+	end := time.Now()	
+
+	execution := end.Nanosecond()-start.Nanosecond()
+	fmt.Printf("exectution time: %f ms\n", float64(execution)/1000000)
+	fmt.Printf("amount: %d\n", sum)
+}
