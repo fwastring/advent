@@ -1,0 +1,100 @@
+package main
+
+import (
+	"fmt"
+	"os"
+	"strings"
+	"time"
+)
+
+
+func main() {
+	start := time.Now()
+	dat, _ := os.ReadFile("./input")
+
+	data := string(dat)
+	lines := strings.Split(data, "\n")
+
+	if len(lines) > 0 && lines[len(lines)-1] == "" {
+		lines = lines[:len(lines)-1]
+	}
+	charMap := make([][]string, len(lines))
+
+	for i, line := range lines {
+		chars := strings.Split(line, "")
+		charMap[i] = chars
+	}
+
+	isValid := true
+	for isValid {
+		for i := range charMap {
+			for j := range charMap[i] {
+				switch charMap[i][j] {
+				case "^":
+					if i == 0 {
+						isValid = false
+					} else {
+						if charMap[i-1][j] == "#" {
+							charMap[i][j] = ">"
+						} else {
+							charMap[i-1][j] = "^"
+							charMap[i][j] = "X"
+						}
+					}
+				case ">":
+					if j == len(charMap[i])-1 {
+						isValid = false
+					} else {
+						if charMap[i][j+1] == "#" {
+							charMap[i][j] = "v"
+						} else {
+							charMap[i][j+1] = ">"
+							charMap[i][j] = "X"
+						}
+					}
+				case "<":
+					if j == 0 {
+						isValid = false
+					} else {
+						if charMap[i][j-1] == "#" {
+							charMap[i][j] = "^"
+						} else {
+							charMap[i][j-1] = "<"
+							charMap[i][j] = "X"
+						}
+					}
+				case "v":
+					if i == len(charMap[i])-1 {
+						isValid = false
+					} else {
+						if charMap[i+1][j] == "#" {
+							charMap[i][j] = "<"
+						} else {
+							charMap[i+1][j] = "v"
+							charMap[i][j] = "X"
+						}
+					}
+				}
+			}
+		}
+	}
+
+	for _, line := range charMap {
+		fmt.Println(line)
+	}
+
+	counter := 0
+
+	for i := range charMap {
+		for j := range charMap[i] {
+			if charMap[i][j] == "X" {
+				counter++
+			}
+		}
+	}
+
+	// Calculate and print execution time
+	execution := time.Since(start)
+	fmt.Printf("Execution time: %f ms\n", float64(execution.Microseconds())/1000)
+	fmt.Printf("Amount: %d\n", counter)
+}

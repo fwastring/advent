@@ -1,0 +1,84 @@
+package main
+
+import (
+	"fmt"
+	"os"
+	"strings"
+	"time"
+)
+
+func main() {
+	start := time.Now()
+	dat, _ := os.ReadFile("./input")
+
+	data := string(dat)
+	lines := strings.Split(data, "\n")
+	charMap := make([][]string, len(lines))
+
+	// Create matrix
+	for i, line := range lines {
+		charMap[i] = strings.Split(line, "")
+	}
+
+	// Word search
+	counter := 0
+	for row := range charMap {
+		for col, char := range charMap[row] {
+			if char == "X" {
+				directions := []int{-1, 0, 1}
+				for _, i := range directions {
+					for _, j := range directions {
+						// Skip the current cell
+						if !(i == 0 && j == 0) {
+							// Check for "M" in the given direction
+							if checkDirections(charMap, row, col, Direction{i, j}, "M") {
+								counter++
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+
+	// Calculate and print execution time
+	execution := time.Since(start)
+	fmt.Printf("Execution time: %f ms\n", float64(execution.Microseconds())/1000)
+	fmt.Printf("Amount: %d\n", counter)
+}
+
+type Direction struct {
+	X int
+	Y int
+}
+
+func checkDirections(charMap [][]string, row, col int, direction Direction, letter string) bool {
+	// Move to the next cell in the given direction
+	x := row + direction.X
+	y := col + direction.Y
+
+	// Check bounds
+	if x >= 0 && y >= 0 && x < len(charMap)-1 && y < len(charMap[0]) {
+		if charMap[x][y] == letter {
+			// If the current letter matches the last one in the sequence
+			if letter == "S" {
+				fmt.Println("Found sequence ending at:", x, y)
+				return true
+			}
+
+			// Determine the next letter in the sequence
+			var nextLetter string
+			switch letter {
+			case "M":
+				nextLetter = "A"
+			case "A":
+				nextLetter = "S"
+			}
+
+			// Recursively check in the same direction
+			return checkDirections(charMap, x, y, direction, nextLetter)
+		}
+	}
+	return false
+}
+

@@ -29,7 +29,7 @@ func main() {
 		}
 	}
 
-	// Trim the slice w.r.t conditionals
+	// Find the indexes to be removed w.r.t conditionals
 	indexes := make([]int, 0)
 	for i, mult := range multiplications {
 		if mult == "don't()" {
